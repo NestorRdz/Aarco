@@ -1,8 +1,250 @@
-﻿@{
+﻿@*@model Aarco.Models.Catalogo*@
+@{
     ViewData["Title"] = "Home Page";
 }
+    <h1 class="display-4">Examen</h1>
+    <div class="text-center">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        <h2>Vehículo</h2>
+
+        <p>
+            <label>Marca</label>
+            <select id="Marca" onclick="FillMarca(this.id, 1, 1)" onchange="FillSubmarca()" required>
+                <option value="-1">Seleccione una opción</option>
+            </select>
+        </p>
+        <p>
+            <label>Submarca</label>
+            <select id="Submarca" onchange="FillModelo()" required>
+                <option value="-1">Seleccione una opción</option>
+            </select>
+        </p>
+
+        <p>
+            <label>Modelo</label>
+            <select id="Modelo" onchange="FillDescripcion()" required>
+                <option value="-1">Seleccione una opción</option>
+            </select>
+        </p>
+
+        <p>
+            <label>Descripcion</label>
+            <select id="Descripcion" required>
+                <option value="-1">Seleccione una opción</option>
+            </select>
+        </p>
+
+    </div>
+    <div class="text-center">
+        <h2>Domicilio</h2>
+        <p>
+            <label>Codigo postal:</label>
+            <input type="text" id="inpCp" onkeyup="ObtenerCP()" />
+        </p>
+        <p>
+            <label>Estado:</label>
+            <input type="text" id="inpEst"  />
+        </p>
+        <p>
+            <label>Municipio:</label>
+            <input type="text" id="inpMun" />
+        </p>
+        <p>
+            <label>Colonia:</label>
+            <input type="text" id="inpCol"  />
+        </p>
+    </div>
+    <div class="text-center">
+        <h2>Domicilio</h2>
+        <p>
+            <label>Fecha Nacimiento:</label>
+            <input type="date" id="inpFecha" onchange="MayorEdad()" />
+        </p>
+        <p>
+            <label>Sexo:</label>
+            <select id="Sexo" >
+                <option value="-1">Seleccione una opción</option>
+                <option value="0">Masculino</option>
+                <option value="1">Femenino</option>
+            </select>
+        </p>
+        <p><label class="alert-danger" id="Alerta"></label><label class="alert-success" id="Valido"></label></p>
+        <p>
+            
+            <input type="submit" value="Validar" onclick="Validaciones()"/>
+        </p>
+    </div>
+
+<script>
+    function FillMarca(nombreCat, filtro, id)
+    {
+        var url = "@Url.Action("Catalogo", "Home")";
+        var data = { nombreCat: nombreCat, filtro: filtro, id: id };
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if ($("#Marca > option").length == 1) {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#Marca").append("<option value=" + data[i].iIdMarca + ">" + data[i].sMarca + "</option>");
+                    }
+                }
+            },
+            error: function () {
+                alert("Error!!");
+            }
+        });
+    }
+    function FillSubmarca()
+    {
+        var nombreCat = "Submarca";
+        LimpiarSelect("Submarca");
+        var url = "@Url.Action("Catalogo", "Home")";
+        var filtro = $("#Marca option:selected").val();
+        var id = 2;
+        var data = { nombreCat: nombreCat, filtro: filtro, id: id };
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if ($("#Submarca > option").length == 1) {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#Submarca").append("<option value=" + data[i].iIdSubMarca + ">" + data[i].sSubMarca + "</option>");
+                    }
+                }
+            },
+            error: function () {
+                alert("Error!!");
+            }
+        });
+    }
+
+    function FillModelo()
+    {
+        var nombreCat = "Modelo";
+        LimpiarSelect("Modelo");
+        var url = "@Url.Action("Catalogo", "Home")";
+        var filtro = $("#Submarca option:selected").val();
+        var id = 2;
+        var data = { nombreCat: nombreCat, filtro: filtro, id: id };
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if ($("#Modelo > option").length == 1) {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#Modelo").append("<option value=" + data[i].iIdModelo + ">" + data[i].sModelo + "</option>");
+                    }
+                }
+            },
+            error: function () {
+                alert("Error!!");
+            }
+        });
+    }
+      function FillDescripcion()
+      {
+
+          var nombreCat = "DescripcionModelo";
+          LimpiarSelect("Descripcion");
+        var url = "@Url.Action("Catalogo", "Home")";
+        var filtro = $("#Modelo option:selected").val();
+        var id = 2;
+        var data = { nombreCat: nombreCat, filtro: filtro, id: id };
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if ($("#Descripcion > option").length == 1) {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#Descripcion").append("<option value=" + data[i].iIdDescripcionModelo + ">" + data[i].sDescripcion + "</option>");
+                    }
+                }
+            },
+            error: function () {
+                alert("Error!!");
+            }
+        });
+    }
+
+    function LimpiarSelect(nombre) {
+        var contador = $("#" + nombre + " > option").length;
+        for (var i = 0; i < contador; i++) {
+            $("#" + nombre + " > option").remove();
+        }
+        $("#" + nombre).append('<option value="-1">Seleccione una opción</option>');
+    }
+    function ObtenerCP() {
+        var input = $("#inpCp").val();
+        var resp = parseInt(input);
+        if (input.length == 5 && parseInt(input) >= 1000 && parseInt(input) <= 99999) {
+            FillDom();
+        }
+    }
+    function FillDom() {
+        var nombreCat = "Sepomex";
+        var url = "@Url.Action("Catalogo", "Home")";
+        var filtro = $("#inpCp").val();
+        var id = 2;
+        var data = { nombreCat: nombreCat, filtro: filtro, id: id };
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#inpEst").val(data[i]['municipio']['estado'].sEstado);
+                    $("#inpMun").val(data[i]['municipio'].sMunicipio);
+                    $("#inpCol").val(data[i]['ubicacion'][0].sUbicacion);
+                }
+                
+            },
+            error: function () {
+                alert("Error!!");
+            }
+        });
+    }
+    function MayorEdad() {
+        var fechaNa = $("#inpFecha").val();
+        var fechaIni = new Date(fechaNa);
+        var fechaFin = new Date();
+        var diff = fechaFin - fechaIni;
+        var diferencia = Math.floor((diff / (1000 * 60 * 60 * 24)) / 365);
+        if (diferencia >= 18) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function Validaciones() {
+        $("#Valido").text("");
+        $("#Alerta").text("");
+        if (!MayorEdad()) {
+            $("#Alerta").text("¡Ingrese una fehca valida! (No puede ser menor de edad)");
+        } else {
+            if ($("#inpCp").val().length < 5) {
+                $("#Alerta").text("¡El campo Codigo postal es incorrecto!");
+            } else {
+                if ($("#Descripcion option:selected").val() == -1) {
+                    $("#Alerta").text("¡El campo Descripcion es incorrecto!");
+                } else {
+                    if ($("#Sexo option:selected").val() == -1) {
+                        $("#Alerta").text("¡El campo Sexo es incorrecto!");
+                    } else {
+                        $("#Valido").text("¡Todo correcto!");
+                    }
+                }
+                
+            }
+        }
+    }
+</script>
